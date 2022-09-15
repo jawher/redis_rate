@@ -2,18 +2,19 @@ package redis_rate_test
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
-	"github.com/go-redis/redis/v8"
-	"github.com/stretchr/testify/require"
+	"github.com/go-redis/redis_rate/v10"
 
-	"github.com/go-redis/redis_rate/v9"
+	"github.com/go-redis/redis/v9"
+	"github.com/stretchr/testify/require"
 )
 
 func rateLimiter() *redis_rate.Limiter {
 	ring := redis.NewRing(&redis.RingOptions{
-		Addrs: map[string]string{"server0": ":6379"},
+		Addrs: map[string]string{"server0": os.Getenv("REDIS_ADDR")},
 	})
 	if err := ring.FlushDB(context.TODO()).Err(); err != nil {
 		panic(err)
