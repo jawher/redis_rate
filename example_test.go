@@ -4,14 +4,17 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-redis/redis/v8"
-	"github.com/go-redis/redis_rate/v9"
+	"os"
+
+	"github.com/go-redis/redis_rate/v10"
+
+	"github.com/go-redis/redis/v9"
 )
 
 func ExampleNewLimiter() {
 	ctx := context.Background()
 	rdb := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: os.Getenv("REDIS_ADDR"),
 	})
 	_ = rdb.FlushDB(ctx).Err()
 

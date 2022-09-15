@@ -1,0 +1,11 @@
+project_name: redis_rate
+builds:
+  - skip: true
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

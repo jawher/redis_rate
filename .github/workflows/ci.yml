@@ -1,0 +1,72 @@
+name: CI
+
+on: push
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go:
+          - '1.19'
+          - '1.18'
+          - '1.17'
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379/tcp
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+        id: go
+
+      - name: Test
+        run: go test -v -race ./...
+        env:
+          REDIS_ADDR: localhost:${{ job.services.redis.ports[6379] }}
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+        id: go
+
+      - name: lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.49
+
+  release:
+    name: ensure release works
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+        id: go
+
+      - name: Release the application
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          args: release --rm-dist --snapshot --skip-publish --debug
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

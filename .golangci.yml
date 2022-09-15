@@ -1,0 +1,8 @@
+run:
+  timeout: 5m
+linters:
+  enable:
+    - goimports
+    - bodyclose
+    - ineffassign
+    - errcheck
